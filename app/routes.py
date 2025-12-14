@@ -58,6 +58,18 @@ def shorten_url():
         "short_code" : newUrl.short_code
         })
 
-@bp.route('/<short_url>', methods= ['GET'])
-def redirect_url(short_url):
-    return jsonify({"url": short_url})
+@bp.route('/<short_code>', methods= ['GET'])
+def redirect_url(short_code):
+    if not short_code:
+        return jsonify({"error": "Missing short code"}), 400
+    
+    url_record = db.session.execute(
+        db.select(Url).where(Url.short_code == short_code)
+        ).scalar_one_or_none()
+
+    if url_record is None:
+        return jsonify({
+            "error": f"Short code {short_code} is not found"
+            }), 404
+    
+    return redirect(url_record.url, code=302)
