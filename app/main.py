@@ -1,29 +1,6 @@
-from flask import Flask
-import os 
-from app.db import db
+from app import create_app
 
-def create_app():
-    # Create and configure the app
-    app = Flask(__name__)
-    app.config.from_mapping(
-        SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
-        SQLALCHEMY_DATABASE_URI='sqlite:///flaskr.sqlite',
-    )
+app = create_app()
 
-    db.init_app(app)
-
-    with app.app_context():
-        db.create_all()
-
-    # Ensure the instance folder exists
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
-
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
-    
-    return app
+if __name__ == '__main__':
+    app.run(debug=True)
